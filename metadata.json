@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Docente Inteligente - Generador de Planes Algebraicos",
+  "description": "Una herramienta minimalista y profesional para docentes de álgebra, diseñada para generar objetivos, actividades y rúbricas automatizadas mediante la API de Gemini.",
+  "requestFramePermissions": []
+}
