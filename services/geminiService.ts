@@ -7,20 +7,21 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 export const generateLessonPlan = async (data: LessonFormData): Promise<GeneratedContent> => {
   const model = 'gemini-3-pro-preview';
   
-  const prompt = `Eres un coordinador académico experto del Colegio Marruecos y Molinos I.E.D. en Bogotá.
-  Tu misión es diseñar una planeación pedagógica de excelencia para el docente ${data.teacherName} en la asignatura de ${data.subject}.
+  const prompt = `Actúa como Coordinador Pedagógico del Colegio Marruecos y Molinos I.E.D.
+  Diseña una planeación de clase y una GUÍA DE APRENDIZAJE EXTENSA para el docente ${data.teacherName}.
+  Tema: ${data.topic}. Grado: ${data.grade}. Asignatura: ${data.subject}.
   
-  PEI Institucional: "Respuesta a un sueño de crecer juntos y ser felices mientras aprehendemos".
-  Nivel: Grado ${data.grade}.
-  Tema central: ${data.topic}.
-  Objetivo/Propósito: ${data.generalObjectives}.
-  
-  INSTRUCCIONES:
-  1. Genera 3 actividades obligatoriamente siguiendo la estructura: "Inicio" (motivación/saberes previos), "Desarrollo" (conceptualización/práctica) y "Cierre" (evaluación/conclusión).
-  2. Crea una rúbrica de evaluación con 3 criterios enfocados en competencias para el contexto de educación distrital.
-  3. El tono debe ser profesional, pedagógico y centrado en el estudiante.
-  
-  Responde estrictamente en formato JSON.`;
+  REQUISITOS DE CONTENIDO (JSON):
+  1. Planeación Docente: 3 actividades (Inicio, Desarrollo, Cierre).
+  2. Guía Estudiante - Introducción: Un texto motivador y objetivos para el alumno.
+  3. Guía Estudiante - Cierre: Actividades de autoevaluación y reflexión final (Se mostrará después de la intro).
+  4. Guía Estudiante - Desarrollo Pág 1: Fundamentación teórica y definiciones clave.
+  5. Guía Estudiante - Desarrollo Pág 2: Ejemplos resueltos detallados y análisis de casos.
+  6. Guía Estudiante - Desarrollo Pág 3: Taller de ejercicios prácticos y retos de aplicación.
+  7. Rúbrica: 3 criterios de evaluación.
+
+  Asegúrate de que el contenido de desarrollo sea lo suficientemente extenso para llenar 3 páginas completas de papel A4.
+  Responde únicamente con el objeto JSON estructurado.`;
 
   const response = await ai.models.generateContent({
     model,
@@ -35,36 +36,39 @@ export const generateLessonPlan = async (data: LessonFormData): Promise<Generate
             items: {
               type: Type.OBJECT,
               properties: {
-                phase: { type: Type.STRING, enum: ["Inicio", "Desarrollo", "Cierre"] },
+                phase: { type: Type.STRING },
                 title: { type: Type.STRING },
                 description: { type: Type.STRING },
                 duration: { type: Type.STRING }
-              },
-              required: ["phase", "title", "description", "duration"]
+              }
             }
           },
+          studentIntro: { type: Type.STRING },
+          studentClosure: { type: Type.STRING },
+          devPage1: { type: Type.STRING },
+          devPage2: { type: Type.STRING },
+          devPage3: { type: Type.STRING },
           rubric: {
             type: Type.ARRAY,
             items: {
               type: Type.OBJECT,
               properties: {
                 aspect: { type: Type.STRING },
-                excellent: { type: Type.STRING, description: "Desempeño Superior" },
-                good: { type: Type.STRING, description: "Desempeño Básico" },
-                needsImprovement: { type: Type.STRING, description: "Desempeño Bajo" }
-              },
-              required: ["aspect", "excellent", "good", "needsImprovement"]
+                excellent: { type: Type.STRING },
+                good: { type: Type.STRING },
+                needsImprovement: { type: Type.STRING }
+              }
             }
           },
           summary: { type: Type.STRING }
         },
-        required: ["suggestedActivities", "rubric", "summary"]
+        required: ["suggestedActivities", "studentIntro", "studentClosure", "devPage1", "devPage2", "devPage3", "rubric", "summary"]
       }
     }
   });
 
   const text = response.text;
-  if (!text) throw new Error("Error en la conexión con la IA.");
+  if (!text) throw new Error("No se pudo generar el contenido.");
   
   return JSON.parse(text) as GeneratedContent;
 };
