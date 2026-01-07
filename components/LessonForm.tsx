@@ -11,12 +11,12 @@ const LessonForm: React.FC<LessonFormProps> = ({ onSubmit, isLoading }) => {
   const [formData, setFormData] = useState<LessonFormData>({
     teacherName: 'Giovanny Quiazúa',
     subject: 'Matemáticas',
-    grade: 'Octavo',
+    grade: 'Sexto',
     sede: 'A',
     shift: 'Mañana',
     period: 'Primer Periodo',
-    topic: '',
-    generalObjectives: ''
+    topic: 'm.c.m',
+    generalObjectives: 'Comprender y aplicar el concepto de mínimo común múltiplo (m.c.m) en la resolución de situaciones problema y simplificación de fracciones.'
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

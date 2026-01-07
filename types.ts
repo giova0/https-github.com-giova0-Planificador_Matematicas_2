@@ -27,10 +27,18 @@ export interface RubricCriteria {
 export interface GeneratedContent {
   suggestedActivities: Activity[];
   studentIntro: string;
+  theoryPart1: string;
+  theoryPart2: string;
+  theoryPart3: string;
+  examplesPart1: string;
+  examplesPart2: string;
+  examplesPart3: string;
+  applicationPart1: string;
+  applicationPart2: string;
+  workshopPart1: string;
+  workshopPart2: string;
   studentClosure: string;
-  devPage1: string;
-  devPage2: string;
-  devPage3: string;
   rubric: RubricCriteria[];
+  glossary: string;
   summary: string;
 }

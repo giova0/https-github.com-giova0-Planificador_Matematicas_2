@@ -16,9 +16,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ content, formData }) =>
 
     const opt = {
       margin: 0,
-      filename: `Guia_Institucional_${formData.topic.replace(/\s+/g, '_')}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      filename: `Guia_Institucional_15_Paginas_${formData.topic.replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg', quality: 1.0 },
+      html2canvas: { scale: 1.5, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -31,156 +31,224 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ content, formData }) =>
     }
   };
 
-  const PageHeader = ({ title }: { title: string }) => (
-    <div className="border-2 border-black p-3 mb-6 bg-white">
-      <div className="text-center">
-        <h2 className="text-lg font-black uppercase leading-tight">Colegio Marruecos y Molinos I.E.D.</h2>
-        <p className="text-[10px] font-bold border-y border-black my-1 py-1 uppercase tracking-widest">{title}</p>
-      </div>
-      <div className="grid grid-cols-2 gap-2 text-[10px] mt-2">
-        <div className="border-b border-black"><strong>Estudiante:</strong> _________________________________</div>
-        <div className="border-b border-black"><strong>Curso:</strong> {formData.grade} _____</div>
-        <div><strong>Asignatura:</strong> {formData.subject}</div>
-        <div><strong>Fecha:</strong> __________________</div>
+  const PageContainer = ({ children, pageNum }: { children?: React.ReactNode, pageNum: number }) => (
+    <div 
+      className="bg-white p-16 shadow-2xl relative border border-gray-100 flex flex-col mb-10" 
+      style={{ width: '210mm', minHeight: '297mm', pageBreakBefore: pageNum > 1 ? 'always' : 'auto' }}
+    >
+      {children}
+      <div className="mt-auto pt-6 border-t border-slate-200 flex justify-between items-center text-[8px] text-slate-400 uppercase tracking-widest font-semibold">
+        <span>Colegio Marruecos y Molinos I.E.D. - Sede {formData.sede} - {formData.shift}</span>
+        <span className="font-black text-slate-900 text-xs">Página {pageNum} de 15</span>
       </div>
     </div>
   );
 
+  const PageHeader = ({ subtitle }: { subtitle: string }) => (
+    <div className="mb-8 border-b-2 border-slate-900 pb-2">
+      <div className="flex justify-between items-end">
+        <div>
+          <h2 className="text-xl font-black text-slate-900 uppercase">Marruecos y Molinos I.E.D.</h2>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{subtitle}</p>
+        </div>
+        <div className="text-right text-[9px] font-mono">
+          REF: {formData.topic.substring(0,3).toUpperCase()}-{new Date().getFullYear()}
+        </div>
+      </div>
+    </div>
+  );
+
+  const BookParagraphs = ({ text }: { text: string }) => (
+    <div className="text-[13px] leading-[1.8] text-justify text-slate-800 space-y-6">
+      {text.split('\n\n').map((para, i) => (
+        <p key={i} className="indent-8 first:indent-0">
+          {para}
+        </p>
+      ))}
+    </div>
+  );
+
+  const SectionTitle = ({ title, color = "bg-slate-900" }: { title: string, color?: string }) => (
+    <h3 className={`text-sm font-black text-white uppercase mb-6 px-4 py-2 ${color} inline-block tracking-tight`}>
+      {title}
+    </h3>
+  );
+
   return (
-    <div className="mt-12 space-y-8">
-      <div className="flex justify-end gap-4 no-print">
+    <div className="mt-12 flex flex-col items-center">
+      <div className="flex justify-end w-full max-w-[210mm] no-print mb-6">
         <button
           onClick={handleDownloadPDF}
-          className="px-6 py-3 bg-green-700 text-white rounded-xl font-bold hover:bg-green-800 shadow-xl flex items-center gap-2 transition-all transform hover:scale-105"
+          className="px-8 py-4 bg-green-700 text-white rounded-2xl font-black hover:bg-green-800 shadow-2xl flex items-center gap-3 transition-all transform hover:-translate-y-1 active:scale-95"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-          Descargar Planeación y Guía Completa (5 Págs)
+          Generar Obra de Aprendizaje (15 Págs)
         </button>
       </div>
 
-      <div ref={printRef} className="flex flex-col items-center bg-slate-100 p-4 gap-8">
+      <div ref={printRef} className="flex flex-col bg-slate-200 p-1">
         
         {/* PÁGINA 1: PLANEACIÓN DOCENTE */}
-        <div className="bg-white p-12 shadow-2xl" style={{ width: '210mm', minHeight: '297mm' }}>
-          <div className="text-center mb-6 border-b-2 border-black pb-2">
-            <p className="text-[9px] font-bold uppercase">Secretaría de Educación del Distrito</p>
-            <h1 className="text-xl font-black">COLEGIO MARRUECOS Y MOLINOS I.E.D.</h1>
-            <p className="text-[10px] italic">"Respuesta a un sueño de crecer juntos y ser felices mientras aprehendemos"</p>
-            <div className="bg-black text-white mt-2 py-1 text-xs font-bold">FORMATO DE PLANEACIÓN PEDAGÓGICA</div>
+        <PageContainer pageNum={1}>
+          <div className="text-center mb-12">
+            <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900">Protocolo de Planeación</h1>
+            <p className="text-xs text-slate-500 font-bold mt-2">GESTIÓN ACADÉMICA - COLEGIO MARRUECOS Y MOLINOS</p>
           </div>
-
-          <div className="border border-black text-[11px] mb-4">
-            <div className="grid grid-cols-4 divide-x divide-black border-b border-black">
-              <div className="p-1 col-span-2 uppercase"><strong>Docente:</strong> {formData.teacherName}</div>
-              <div className="p-1 uppercase"><strong>Asignatura:</strong> {formData.subject}</div>
-              <div className="p-1 uppercase"><strong>Grado:</strong> {formData.grade}</div>
-            </div>
-            <div className="grid grid-cols-4 divide-x divide-black">
-              <div className="p-1 uppercase"><strong>Sede:</strong> {formData.sede}</div>
-              <div className="p-1 uppercase"><strong>Jornada:</strong> {formData.shift}</div>
-              <div className="p-1 uppercase"><strong>Periodo:</strong> {formData.period}</div>
-              <div className="p-1 uppercase"><strong>Fecha:</strong> {new Date().toLocaleDateString()}</div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="border border-black p-2 bg-gray-50">
-              <h3 className="font-bold text-xs uppercase underline">Tema Central:</h3>
-              <p className="text-sm font-bold">{formData.topic}</p>
-            </div>
-            <div className="border border-black">
-              <div className="bg-gray-800 text-white text-center py-1 text-[10px] font-bold uppercase">Secuencia Didáctica</div>
-              <div className="divide-y divide-black">
-                {content.suggestedActivities.map((act, i) => (
-                  <div key={i} className="p-2 flex gap-4">
-                    <div className="w-20 shrink-0 text-center">
-                      <span className="text-[9px] font-bold uppercase bg-gray-200 block">{act.phase}</span>
-                      <span className="text-[8px] italic block">{act.duration}</span>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-[10px] uppercase underline">{act.title}</h4>
-                      <p className="text-[10px] text-justify">{act.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="border border-black">
-              <div className="bg-gray-200 text-center py-1 text-[10px] font-bold uppercase border-b border-black">Evaluación y Rúbrica</div>
-              <table className="w-full text-[9px] border-collapse">
-                <tbody>
-                  {content.rubric.map((r, i) => (
-                    <tr key={i} className="border-b border-black last:border-0">
-                      <td className="p-1 border-r border-black font-bold uppercase w-1/4">{r.aspect}</td>
-                      <td className="p-1 text-justify"><span className="font-bold">S:</span> {r.excellent} | <span className="font-bold">B:</span> {r.good}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        {/* PÁGINA 2: INTRODUCCIÓN Y CIERRE (SOLICITADO) */}
-        <div className="bg-white p-12 shadow-2xl" style={{ width: '210mm', minHeight: '297mm', pageBreakBefore: 'always' }}>
-          <PageHeader title="Guía de Aprendizaje - Inicio y Reflexión" />
-          <h3 className="text-center text-lg font-bold bg-green-50 border border-black p-2 mb-6 uppercase">
-            Introducción: {formData.topic}
-          </h3>
           
-          <div className="space-y-8">
-            <section>
-              <h4 className="font-black text-green-800 border-b-2 border-green-800 mb-2 uppercase text-xs">1. ¿Qué vamos a aprender? (Introducción)</h4>
-              <div className="text-sm leading-relaxed text-justify whitespace-pre-wrap px-4 italic">
-                {content.studentIntro}
+          <div className="grid grid-cols-2 gap-px bg-slate-900 border border-slate-900 mb-8">
+            <div className="bg-white p-3 text-[10px]"><strong>DOCENTE:</strong> {formData.teacherName}</div>
+            <div className="bg-white p-3 text-[10px]"><strong>ASIGNATURA:</strong> {formData.subject}</div>
+            <div className="bg-white p-3 text-[10px]"><strong>GRADO:</strong> {formData.grade}</div>
+            <div className="bg-white p-3 text-[10px]"><strong>TEMA:</strong> {formData.topic}</div>
+          </div>
+
+          <SectionTitle title="Secuencia de Aprendizaje" />
+          <div className="space-y-4 mb-10">
+            {content.suggestedActivities.map((act, i) => (
+              <div key={i} className="border-l-4 border-slate-900 pl-4 py-2">
+                <div className="text-[9px] font-black text-slate-400 uppercase">{act.phase} ({act.duration})</div>
+                <h4 className="font-bold text-xs uppercase">{act.title}</h4>
+                <p className="text-[10px] text-slate-600 mt-1">{act.description}</p>
               </div>
-            </section>
+            ))}
+          </div>
 
-            <section className="bg-slate-50 p-6 border-2 border-dashed border-slate-300">
-              <h4 className="font-black text-slate-800 border-b-2 border-slate-800 mb-4 uppercase text-xs">2. Cierre y Autoevaluación (Reflexión Final)</h4>
-              <div className="text-sm leading-relaxed text-justify whitespace-pre-wrap">
-                {content.studentClosure}
-              </div>
-              <div className="mt-6 grid grid-cols-3 gap-2 text-center text-[10px] uppercase font-bold">
-                <div className="border border-black p-2">¿Lo logré? <br/> [ ]</div>
-                <div className="border border-black p-2">¿Tengo dudas? <br/> [ ]</div>
-                <div className="border border-black p-2">¿Puedo mejorar? <br/> [ ]</div>
-              </div>
-            </section>
-          </div>
-        </div>
+          <SectionTitle title="Objetivos Generales" color="bg-green-700" />
+          <p className="text-[11px] leading-relaxed italic text-slate-600 mb-10 px-4">
+            {formData.generalObjectives}
+          </p>
 
-        {/* PÁGINA 3: DESARROLLO PÁG 1 (TEORÍA) */}
-        <div className="bg-white p-12 shadow-2xl" style={{ width: '210mm', minHeight: '297mm', pageBreakBefore: 'always' }}>
-          <PageHeader title="Guía de Aprendizaje - Desarrollo Teórico (Pág 1/3)" />
-          <h4 className="font-black text-blue-900 border-b-2 border-blue-900 mb-4 uppercase text-sm">Contenido Temático y Fundamentación</h4>
-          <div className="text-[12px] leading-relaxed text-justify whitespace-pre-wrap prose max-w-none">
-            {content.devPage1}
+          <div className="mt-auto border-t-2 border-slate-900 pt-4">
+            <p className="text-[9px] font-bold text-center italic">Documento firmado por el Departamento de {formData.subject}</p>
           </div>
-        </div>
+        </PageContainer>
 
-        {/* PÁGINA 4: DESARROLLO PÁG 2 (EJEMPLOS) */}
-        <div className="bg-white p-12 shadow-2xl" style={{ width: '210mm', minHeight: '297mm', pageBreakBefore: 'always' }}>
-          <PageHeader title="Guía de Aprendizaje - Ejemplificación (Pág 2/3)" />
-          <h4 className="font-black text-orange-800 border-b-2 border-orange-800 mb-4 uppercase text-sm">Ejemplos Paso a Paso y Casos de Estudio</h4>
-          <div className="text-[12px] leading-relaxed text-justify whitespace-pre-wrap prose max-w-none bg-orange-50/30 p-4 rounded border border-orange-100">
-            {content.devPage2}
+        {/* PÁGINA 2: PORTADA ESTUDIANTIL */}
+        <PageContainer pageNum={2}>
+          <div className="flex-1 flex flex-col justify-center items-center text-center">
+            <div className="mb-16">
+              <h2 className="text-xl font-bold text-slate-400 uppercase tracking-[0.4em]">Guía de Trabajo</h2>
+              <div className="w-16 h-1 bg-slate-900 mx-auto mt-4"></div>
+            </div>
+            <h1 className="text-6xl font-black text-slate-900 uppercase leading-[0.9] max-w-lg mb-12">
+              {formData.topic}
+            </h1>
+            <div className="max-w-md">
+              <SectionTitle title="Introducción" color="bg-blue-800" />
+              <BookParagraphs text={content.studentIntro} />
+            </div>
           </div>
-        </div>
+        </PageContainer>
 
-        {/* PÁGINA 5: DESARROLLO PÁG 3 (TALLER) */}
-        <div className="bg-white p-12 shadow-2xl" style={{ width: '210mm', minHeight: '297mm', pageBreakBefore: 'always' }}>
-          <PageHeader title="Guía de Aprendizaje - Taller Práctico (Pág 3/3)" />
-          <h4 className="font-black text-purple-900 border-b-2 border-purple-900 mb-4 uppercase text-sm">Actividades de Aplicación y Ejercitación</h4>
-          <div className="text-[12px] leading-relaxed text-justify whitespace-pre-wrap mb-8">
-            {content.devPage3}
+        {/* PÁGINAS 3, 4, 5: TEORÍA */}
+        <PageContainer pageNum={3}>
+          <PageHeader subtitle="Teoría y Conceptos Fundamentales (Parte I)" />
+          <SectionTitle title="1. Fundamentación y Orígenes" />
+          <BookParagraphs text={content.theoryPart1} />
+        </PageContainer>
+
+        <PageContainer pageNum={4}>
+          <PageHeader subtitle="Desarrollo Conceptual (Parte II)" />
+          <SectionTitle title="2. Marco Teórico Estructurado" />
+          <BookParagraphs text={content.theoryPart2} />
+        </PageContainer>
+
+        <PageContainer pageNum={5}>
+          <PageHeader subtitle="Profundización Técnica (Parte III)" />
+          <SectionTitle title="3. Casos Especiales y Análisis" />
+          <BookParagraphs text={content.theoryPart3} />
+        </PageContainer>
+
+        {/* PÁGINAS 6, 7, 8: EJEMPLOS */}
+        <PageContainer pageNum={6}>
+          <PageHeader subtitle="Laboratorio de Ejemplos - Nivel Inicial" />
+          <SectionTitle title="4. Ejemplificación Punto a Punto" color="bg-orange-600" />
+          <BookParagraphs text={content.examplesPart1} />
+        </PageContainer>
+
+        <PageContainer pageNum={7}>
+          <PageHeader subtitle="Ejemplificación - Nivel Intermedio" />
+          <SectionTitle title="5. Análisis de Procesos" color="bg-orange-700" />
+          <BookParagraphs text={content.examplesPart2} />
+        </PageContainer>
+
+        <PageContainer pageNum={8}>
+          <PageHeader subtitle="Resolución de Casos Complejos" />
+          <SectionTitle title="6. Desafíos de Resolución" color="bg-orange-800" />
+          <BookParagraphs text={content.examplesPart3} />
+        </PageContainer>
+
+        {/* PÁGINAS 9, 10: APLICACIÓN */}
+        <PageContainer pageNum={9}>
+          <PageHeader subtitle="Aplicación en Contextos Reales" />
+          <SectionTitle title="7. El Saber en la Práctica" color="bg-emerald-600" />
+          <BookParagraphs text={content.applicationPart1} />
+        </PageContainer>
+
+        <PageContainer pageNum={10}>
+          <PageHeader subtitle="Modelado y Problemática Social" />
+          <SectionTitle title="8. Conexiones Interdisciplinarias" color="bg-emerald-700" />
+          <BookParagraphs text={content.applicationPart2} />
+        </PageContainer>
+
+        {/* PÁGINAS 11, 12: TALLER */}
+        <PageContainer pageNum={11}>
+          <PageHeader subtitle="Taller de Entrenamiento - Fase A" />
+          <SectionTitle title="9. Actividades de Producción Estudiantil" color="bg-red-800" />
+          <BookParagraphs text={content.workshopPart1} />
+        </PageContainer>
+
+        <PageContainer pageNum={12}>
+          <PageHeader subtitle="Taller de Entrenamiento - Fase B" />
+          <SectionTitle title="10. Retos y Desafíos Finales" color="bg-red-900" />
+          <BookParagraphs text={content.workshopPart2} />
+        </PageContainer>
+
+        {/* PÁGINA 13: RÚBRICA */}
+        <PageContainer pageNum={13}>
+          <PageHeader subtitle="Evaluación y Desempeño" />
+          <SectionTitle title="11. Criterios de Calificación" />
+          <div className="overflow-hidden border border-slate-900 rounded-lg">
+            <table className="w-full text-[10px] border-collapse">
+              <thead>
+                <tr className="bg-slate-900 text-white uppercase">
+                  <th className="p-4 border-r border-slate-700 text-left">Aspecto a Evaluar</th>
+                  <th className="p-4 border-r border-slate-700 text-left">Superior / Alto</th>
+                  <th className="p-4 text-left">Básico / Bajo</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {content.rubric.map((r, i) => (
+                  <tr key={i} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-4 font-black uppercase bg-slate-50 border-r border-slate-200">{r.aspect}</td>
+                    <td className="p-4 italic border-r border-slate-200">{r.excellent}</td>
+                    <td className="p-4 text-slate-500">{r.good}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className="border-2 border-black p-4 bg-gray-50 mt-auto">
-            <h5 className="font-bold text-[10px] uppercase mb-2">Espacio para la resolución del estudiante:</h5>
-            <div className="h-48 w-full border-b border-gray-300 border-dashed"></div>
-            <div className="h-48 w-full border-b border-gray-300 border-dashed"></div>
+        </PageContainer>
+
+        {/* PÁGINA 14: CIERRE */}
+        <PageContainer pageNum={14}>
+          <PageHeader subtitle="Reflexión y Autoconocimiento" />
+          <SectionTitle title="12. Metacognición y Cierre" color="bg-indigo-800" />
+          <BookParagraphs text={content.studentClosure} />
+        </PageContainer>
+
+        {/* PÁGINA 15: GLOSARIO */}
+        <PageContainer pageNum={15}>
+          <PageHeader subtitle="Glosario Pedagógico" />
+          <SectionTitle title="13. Diccionario de la Unidad" color="bg-slate-400" />
+          <div className="bg-slate-50 p-10 border-2 border-double border-slate-200">
+            <BookParagraphs text={content.glossary} />
           </div>
-        </div>
+          <div className="mt-auto text-center italic text-[9px] text-slate-400">
+            © {new Date().getFullYear()} Institución Educativa Distrital Marruecos y Molinos. <br/>
+            Bogotá, D.C. - Colombia.
+          </div>
+        </PageContainer>
 
       </div>
     </div>
