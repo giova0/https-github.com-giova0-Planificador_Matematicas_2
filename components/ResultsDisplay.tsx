@@ -31,6 +31,49 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ content, formData }) =>
     }
   };
 
+  const handleExportWord = () => {
+    if (!printRef.current) return;
+
+    // Crear un documento HTML con los estilos necesarios para que Word lo interprete correctamente
+    const header = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset="utf-8">
+        <title>Exportar a Word</title>
+        <style>
+          body { font-family: 'Arial', sans-serif; line-height: 1.6; }
+          .page-break { page-break-before: always; }
+          table { border-collapse: collapse; width: 100%; }
+          th, td { border: 1px solid #333; padding: 8px; }
+          .title { font-size: 24pt; font-weight: bold; text-align: center; text-transform: uppercase; }
+          .section-title { font-size: 16pt; font-weight: bold; border-left: 5px solid #000; padding-left: 10px; margin-top: 20px; text-transform: uppercase; }
+          .paragraph { text-align: justify; margin-bottom: 15px; }
+          .footer { font-size: 8pt; color: #666; text-align: center; margin-top: 50px; }
+        </style>
+      </head>
+      <body>
+    `;
+    const footer = "</body></html>";
+    
+    // Clonamos el contenido pero limpiamos elementos no deseados de la web
+    const contentHtml = printRef.current.innerHTML;
+    const source = header + contentHtml + footer;
+
+    const blob = new Blob(['\ufeff', source], {
+      type: 'application/msword'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Guia_Marruecos_y_Molinos_${formData.topic.replace(/\s+/g, '_')}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const PageContainer = ({ children, pageNum }: { children?: React.ReactNode, pageNum: number }) => (
     <div 
       className="bg-white p-14 shadow-2xl relative border border-gray-100 flex flex-col mb-10 overflow-hidden" 
@@ -77,13 +120,25 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ content, formData }) =>
 
   return (
     <div className="mt-12 flex flex-col items-center">
-      <div className="flex justify-end w-full max-w-[210mm] no-print mb-6">
+      <div className="flex flex-wrap justify-end gap-4 w-full max-w-[210mm] no-print mb-6">
+        <button
+          onClick={handleExportWord}
+          className="px-6 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 shadow-xl flex items-center gap-3 transition-all transform hover:-translate-y-1"
+        >
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6z"/>
+          </svg>
+          Google Docs (Word)
+        </button>
+        
         <button
           onClick={handleDownloadPDF}
-          className="px-8 py-4 bg-green-700 text-white rounded-2xl font-black hover:bg-green-800 shadow-2xl flex items-center gap-3 transition-all transform hover:-translate-y-1"
+          className="px-6 py-4 bg-green-700 text-white rounded-2xl font-black hover:bg-green-800 shadow-xl flex items-center gap-3 transition-all transform hover:-translate-y-1"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-          Descargar Obra Pedagógica (15 Páginas)
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Descargar PDF
         </button>
       </div>
 
@@ -233,7 +288,6 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ content, formData }) =>
               </tbody>
             </table>
           </div>
-          {/* SE REINCORPORA EL ESPACIO PARA COMENTARIOS MANUALES */}
           <div className="mt-8 p-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl no-print">
             <h4 className="text-[10px] font-black uppercase mb-2">Comentarios del Docente:</h4>
             <div className="h-24"></div>
