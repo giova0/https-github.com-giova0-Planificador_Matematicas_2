@@ -7,30 +7,33 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 export const generateLessonPlan = async (data: LessonFormData): Promise<GeneratedContent> => {
   const model = 'gemini-3-pro-preview';
   
-  const prompt = `Actúa como un Autor de Libros de Texto Pedagógicos de Élite y Coordinador del Colegio Marruecos y Molinos I.E.D.
-  Diseña una GUÍA DE APRENDIZAJE MONUMENTAL DE 15 PÁGINAS sobre: ${data.topic}.
+  const prompt = `Actúa como un Autor de Libros de Texto Pedagógicos de Élite para el Colegio Marruecos y Molinos I.E.D.
+  Diseña una OBRA PEDAGÓGICA MONUMENTAL de 15 páginas sobre el tema: ${data.topic}.
   
-  REGLAS DE FORMATO CRÍTICAS:
-  - En las secciones de Ejemplos, Aplicaciones y Talleres, CADA EJEMPLO O ACTIVIDAD DEBE SER UN PUNTO APARTE, estar numerado y tener un título en negrita. No amontones el texto.
-  - El lenguaje debe ser de libro de texto: introducciones largas, explicaciones detalladas y mucho espacio entre ideas.
-  - El volumen de texto debe ser suficiente para llenar 15 páginas A4 reales.
+  REGLAS DE FORMATO PARA GUÍA-TALLER:
+  1. ESPACIOS DE TRABAJO: Incluye intencionalmente espacios para que el estudiante complete o resuelva (ej: usa líneas de guiones bajos "__________" o puntos suspensivos en partes clave de los talleres y desafíos). 
+  2. PUNTO APARTE: Cada ejemplo, enunciado y sección de teoría debe estar separado por dobles saltos de línea (\n\n) para una lectura clara y profesional.
+  3. NO USES LATEX: Está prohibido el uso de símbolos de dólar ($). Escribe fórmulas en texto plano (ej: x^2, raiz de x).
+  4. EXTENSIÓN: Genera contenido denso y explicativo para cubrir las 15 páginas.
+  5. LENGUAJE: Académico y formal de grado ${data.grade}.
 
-  ESTRUCTURA DEL JSON:
-  1. suggestedActivities: Planeación docente (Inicio, Desarrollo, Cierre).
-  2. studentIntro: Portada y presentación motivacional (Pág 2).
-  3. theoryPart1: Historia del concepto, etimología y conceptos base (Pág 3).
-  4. theoryPart2: Desarrollo teórico intermedio y reglas fundamentales (Pág 4).
-  5. theoryPart3: Profundización técnica, casos especiales y teoremas (Pág 5).
-  6. examplesPart1: Laboratorio de ejemplos básicos paso a paso (Pág 6).
-  7. examplesPart2: Ejemplos de nivel medio con diagramas descritos (Pág 7).
-  8. examplesPart3: Ejemplos avanzados y resolución de paradojas (Pág 8).
-  9. applicationPart1: El tema en la vida cotidiana y otras ciencias (Pág 9).
-  10. applicationPart2: Desafíos contemporáneos y modelado complejo (Pág 10).
-  11. workshopPart1: Taller práctico Parte A (Ejercicios 1-10) (Pág 11).
-  12. workshopPart2: Taller práctico Parte B (Retos y Olimpiadas) (Pág 12).
-  13. rubric: Rúbrica institucional detallada (Pág 13).
-  14. studentClosure: Autoevaluación y Metacognición (Pág 14).
-  15. glossary: Glosario de términos clave de la unidad (Pág 15).
+  ESTRUCTURA SOLICITADA (JSON):
+  - suggestedActivities: Guía docente (Página 1).
+  - studentIntro: Portada e introducción motivacional extensa (Página 2).
+  - theoryPart1: Historia y conceptos base (Página 3).
+  - theoryPart2: Marco conceptual y reglas (Página 4).
+  - theoryPart3: Profundización técnica (Página 5).
+  - examplesPart1: Casos de Estudio Resueltos Nivel I (Página 6).
+  - examplesPart2: Casos de Estudio Resueltos Nivel II (Página 7).
+  - examplesPart3: Casos de Estudio Resueltos Nivel III (Página 8).
+  - challengesPart1: Desafíos Prácticos: Aplicaciones Reales (Página 9).
+  - challengesPart2: Desafíos Prácticos: Modelado (Página 10).
+  - productionPart1: Producción Estudiantil: Entrenamiento (Página 11).
+  - productionPart2: Producción Estudiantil: Autónomo (Página 12).
+  - productionPart3: Producción Estudiantil: Nivel Superior (Página 13).
+  - rubric: Rúbrica detallada (Página 14).
+  - studentClosure: Autoevaluación y Cierre (Página 15).
+  - glossary: Glosario de términos.
 
   Responde solo con el JSON.`;
 
@@ -61,11 +64,11 @@ export const generateLessonPlan = async (data: LessonFormData): Promise<Generate
           examplesPart1: { type: Type.STRING },
           examplesPart2: { type: Type.STRING },
           examplesPart3: { type: Type.STRING },
-          applicationPart1: { type: Type.STRING },
-          applicationPart2: { type: Type.STRING },
-          workshopPart1: { type: Type.STRING },
-          workshopPart2: { type: Type.STRING },
-          studentClosure: { type: Type.STRING },
+          challengesPart1: { type: Type.STRING },
+          challengesPart2: { type: Type.STRING },
+          productionPart1: { type: Type.STRING },
+          productionPart2: { type: Type.STRING },
+          productionPart3: { type: Type.STRING },
           rubric: {
             type: Type.ARRAY,
             items: {
@@ -78,13 +81,13 @@ export const generateLessonPlan = async (data: LessonFormData): Promise<Generate
               }
             }
           },
-          glossary: { type: Type.STRING },
-          summary: { type: Type.STRING }
+          studentClosure: { type: Type.STRING },
+          glossary: { type: Type.STRING }
         },
         required: [
-          "suggestedActivities", "studentIntro", "theoryPart1", "theoryPart2", "theoryPart3", 
-          "examplesPart1", "examplesPart2", "examplesPart3", "applicationPart1", "applicationPart2", 
-          "workshopPart1", "workshopPart2", "studentClosure", "rubric", "glossary", "summary"
+          "suggestedActivities", "studentIntro", "theoryPart1", "theoryPart2", "theoryPart3",
+          "examplesPart1", "examplesPart2", "examplesPart3", "challengesPart1", "challengesPart2",
+          "productionPart1", "productionPart2", "productionPart3", "rubric", "studentClosure", "glossary"
         ]
       }
     }

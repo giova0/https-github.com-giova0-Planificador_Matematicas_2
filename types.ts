@@ -33,12 +33,12 @@ export interface GeneratedContent {
   examplesPart1: string;
   examplesPart2: string;
   examplesPart3: string;
-  applicationPart1: string;
-  applicationPart2: string;
-  workshopPart1: string;
-  workshopPart2: string;
-  studentClosure: string;
+  challengesPart1: string;
+  challengesPart2: string;
+  productionPart1: string;
+  productionPart2: string;
+  productionPart3: string;
   rubric: RubricCriteria[];
+  studentClosure: string;
   glossary: string;
-  summary: string;
 }
